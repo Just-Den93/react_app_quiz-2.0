@@ -1,3 +1,4 @@
+// src/components/App/appUtils.ts
 import { Dispatch, SetStateAction } from 'react';
 
 export const startQuizHandler = (
@@ -7,8 +8,8 @@ export const startQuizHandler = (
   setCurrentQuizId: Dispatch<SetStateAction<string | null>>,
   setShowQuizPage: Dispatch<SetStateAction<boolean>>
 ): void => {
-  setSelectedMode(mode);
-  setCurrentQuizId(uuid);
-  setShowQuizPage(true);
+  setSelectedMode(() => mode); // Используем функцию обновления
+  setCurrentQuizId(() => uuid);
+  setShowQuizPage(() => true);
   localStorage.setItem('showQuizPage', 'true');
 };

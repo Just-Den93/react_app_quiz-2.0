@@ -1,5 +1,5 @@
 import { render, fireEvent, screen } from '@testing-library/react';
-import { Button, BUTTON_VARIANTS } from './Button';
+import { Button, BUTTON_VARIANTS } from '../Button';
 
 describe('Button Component', () => {
   const defaultProps = {

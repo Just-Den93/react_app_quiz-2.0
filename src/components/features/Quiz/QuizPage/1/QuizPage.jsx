@@ -1,12 +1,12 @@
 // import React, { useMemo, useState } from 'react';
-// import ContentContainer from '../../../layout/ContentContainer/ContentContainer';
-// import EndMessage from '../../Game/Messages/EndMessage/EndMessage';
-// import MenuModal from '../../../common/MenuModal/MenuModal';
-// import Modal from '../../../common/Modal/Modal';
-// import Settings from '../../../features/Game/Settings/Settings';
-// import ConfettiAnimation from '../../Game/Animation/ConfettiAnimation';
+// import ContentContainer from '../../../../layout/ContentContainer/ContentContainer';
+// import EndMessage from '../../../Game/Messages/EndMessage/EndMessage';
+// import MenuModal from '../../../../common/MenuModal/MenuModal';
+// import Modal from '../../../../common/Modal/Modal';
+// import Settings from '../../../Game/Settings/Settings';
+// import ConfettiAnimation from '../../../Game/Animation/ConfettiAnimation';
 // import styles from './QuizPage.module.css';
-// import { useQuizContext } from '../../../../context/QuizContext';
+// import { useQuizContext } from '../../../../../context/QuizContext';
 // import PCImage from '../../../../assets/images/PC_horizontal_1line_black.svg';
 // import {
 //   getTotalBlocks,
@@ -16,7 +16,7 @@
 //   handleNewGame,
 //   handleMainMenu as quizPageHandleMainMenu,
 //   handleSelectCategory
-// } from './quizPageUtils';
+// } from '../quizPageUtils';
 
 // function QuizPage() {
 //   const { quizStates, setShowQuizPage, currentQuizId, selectedMode, data, markBlockAsUsed, setQuizStates } = useQuizContext();

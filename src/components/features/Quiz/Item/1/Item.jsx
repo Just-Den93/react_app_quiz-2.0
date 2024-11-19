@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Item.module.css';
-import { useQuizContext } from '../../../../context/QuizContext';
-import { checkIfUsed, handleBlockClick } from './itemUtils';
+import { useQuizContext } from '../../../../../context/QuizContext';
+import { checkIfUsed, handleBlockClick } from '../itemUtils';
 
 function Item({ block, categoryId, onBlockSelect }) {
   const { quizStates, currentQuizId } = useQuizContext();

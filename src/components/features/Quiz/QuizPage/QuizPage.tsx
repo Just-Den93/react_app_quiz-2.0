@@ -9,14 +9,7 @@ import styles from './QuizPage.module.css';
 import { useQuizContext } from '../../../../context/QuizContext';
 import { QuizBlock, Category } from '../../../../types/quiz.types';
 import PCImage from '../../../../assets/images/PC_horizontal_1line_black.svg';
-import {
-  getTotalBlocks,
-  getUsedBlocksCount,
-  handleBlockSelect,
-  handleCloseModal,
-  handleNewGame,
-  handleSelectCategory
-} from './quizPageUtils';
+import Utils from './quizPageUtils';
 
 interface SelectedCategory extends Category {
   name: string;
@@ -46,9 +39,9 @@ const QuizPage: React.FC = () => {
   const [isMenuVisible, setIsMenuVisible] = useState<boolean>(false);
   const [isBlockUsed, setIsBlockUsed] = useState<boolean>(false);
 
-  const totalBlocks = useMemo(() => getTotalBlocks(data), [data]);
+  const totalBlocks = useMemo(() => Utils.getTotalBlocks(data), [data]);
   const usedBlocksCount = useMemo(() => 
-    getUsedBlocksCount(currentQuizState), 
+    Utils.getUsedBlocksCount(currentQuizState), 
     [currentQuizState]
   );
 
@@ -57,7 +50,45 @@ const QuizPage: React.FC = () => {
   };
 
   const handleModalClose = (): void => {
-    handleCloseModal(setSelectedBlock, setSelectedCategory, setIsBlockUsed);
+    Utils.handleCloseModal(setSelectedBlock, setSelectedCategory, setIsBlockUsed);
+  };
+
+  const handleBlockSelectWrapper = (block: QuizBlock, category: Category): void => {
+    Utils.handleBlockSelect(
+      block,
+      category,
+      currentQuizState,
+      setSelectedBlock,
+      setSelectedCategory,
+      setIsBlockUsed
+    );
+  };
+
+  const handleSelectCategoryWrapper = (categoryId: string, blockId: number): void => {
+    if (currentQuizId) {
+      Utils.handleSelectCategory(
+        categoryId,
+        blockId,
+        currentQuizId,
+        markBlockAsUsed,
+        totalBlocks,
+        usedBlocksCount,
+        setConfettiRunning,
+        setShowEndMessage,
+        handleModalClose
+      );
+    }
+  };
+
+  const handleNewGameWrapper = (): void => {
+    if (currentQuizId) {
+      Utils.handleNewGame(
+        currentQuizId,
+        setQuizStates,
+        setConfettiRunning,
+        setShowEndMessage
+      );
+    }
   };
 
   return (
@@ -68,16 +99,7 @@ const QuizPage: React.FC = () => {
           <img src={PCImage} alt="PC horizontal line" className={styles.image} />
           <ContentContainer
             data={data}
-            onBlockSelect={(block: QuizBlock, category: Category) =>
-              handleBlockSelect(
-                block,
-                category,
-                currentQuizState,
-                setSelectedBlock,
-                setSelectedCategory,
-                setIsBlockUsed
-              )
-            }
+            onBlockSelect={handleBlockSelectWrapper}
             usedBlocks={currentQuizState.usedBlocks || {}}
           />
 
@@ -87,19 +109,7 @@ const QuizPage: React.FC = () => {
               categoryName={selectedCategory?.name || 'Без категории'}
               onClose={handleModalClose}
               selectedMode={selectedMode || 1}
-              onSelectCategory={(categoryId: string, blockId: number) =>
-                handleSelectCategory(
-                  categoryId,
-                  blockId,
-                  currentQuizId || '',
-                  markBlockAsUsed,
-                  totalBlocks,
-                  usedBlocksCount,
-                  setConfettiRunning,
-                  setShowEndMessage,
-                  handleModalClose
-                )
-              }
+              onSelectCategory={handleSelectCategoryWrapper}
               isBlockUsed={isBlockUsed}
               onTryAgain={() => setIsBlockUsed(false)}
               onContinue={handleModalClose}
@@ -114,12 +124,7 @@ const QuizPage: React.FC = () => {
         <EndMessage
           currentQuizId={currentQuizId}
           setQuizStates={setQuizStates}
-          onNewGame={() => handleNewGame(
-            currentQuizId, 
-            setQuizStates, 
-            setConfettiRunning, 
-            setShowEndMessage
-          )}
+          onNewGame={handleNewGameWrapper}
           onMainMenu={handleMainMenu}
         />
       )}
@@ -127,12 +132,7 @@ const QuizPage: React.FC = () => {
       <MenuModal
         showSettings={() => setIsSettingsVisible(true)}
         showMainMenu={handleMainMenu}
-        onNewGame={() => handleNewGame(
-          currentQuizId || '', 
-          setQuizStates, 
-          setConfettiRunning, 
-          setShowEndMessage
-        )}
+        onNewGame={handleNewGameWrapper}
         isVisible={isMenuVisible}
         closeMenuModal={() => setIsMenuVisible(false)}
       />
