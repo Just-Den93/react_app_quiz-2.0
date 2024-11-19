@@ -1,0 +1,19 @@
+.quiz_page {
+  font-family: "Montserrat", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  /* background-color: #fed86b; */
+  background-color: #e1baa7;
+  overflow-y: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.image {
+  /* margin-bottom: 20px; */
+  margin: 20px 0 10px 0;
+  max-width: 40%;
+  height: auto;
+}

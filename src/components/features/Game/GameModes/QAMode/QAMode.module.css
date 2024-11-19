@@ -1,0 +1,90 @@
+.content {
+  text-align: center;
+  margin: 60px 0 20px 0;
+  padding: 40px;
+  font-size: 20px;
+  background-color: #7958af;
+  border-radius: 30px;
+  border: 10px solid #fff;
+  line-height: 1.5;
+  color: #fff;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: calc(100% - 288px);
+  height: 60%;
+  max-height: 60%;
+}
+
+.selectedInfo {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.infoCategoryName {
+  background-color: transparent;
+  color: #7958af;
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 5px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.selectedNumber {
+  width: 30px;
+  height: 30px;
+  background-color: #7958af;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+
+.controlBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+/* .startTimerButton,
+.showAnswerButton,
+.selectCategoryButton {
+  font-size: 24px;
+  padding: 10px 20px;
+  margin-bottom: 50px;
+  background-color: #7958af;
+  font-weight: 700;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  opacity: 1;
+  display: flex;
+  align-items: center;
+}
+
+.showAnswerButton,
+.selectCategoryButton {
+  background-color: #7958af;
+} */
+
+/* .startButtonIcon {
+  width: 40px;
+  height: 40px;
+} */
+
+.subAnswer {
+  margin: 20px 0;
+}

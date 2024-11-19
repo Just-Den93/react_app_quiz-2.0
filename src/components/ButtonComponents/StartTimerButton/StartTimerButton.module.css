@@ -1,0 +1,25 @@
+.startTimerButton {
+    font-size: 24px;
+    padding: 10px 20px;
+    /* background-color: #7958af; */
+    background-color: #03564a;
+    font-weight: 700;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+    display: flex;
+    align-items: center;
+  }
+  
+  .startButtonIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .startTimerButton:hover {
+    filter: saturate(2);
+  }
+  

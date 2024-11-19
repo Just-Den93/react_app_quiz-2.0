@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.8f984d90.css",
+    "main.js": "/static/js/main.d726dba0.js",
+    "static/media/quizpng.png": "/static/media/quizpng.83d550acc9ba785d31e6.png",
+    "static/media/PC_horizontal_1line_black.svg": "/static/media/PC_horizontal_1line_black.9fb6a9730a03125d754cab7633aff586.svg",
+    "static/media/PC_horizontal_1line_color.svg": "/static/media/PC_horizontal_1line_color.dd5eff53fbbeb71f69f9a124bb53cd08.svg",
+    "index.html": "/index.html",
+    "main.8f984d90.css.map": "/static/css/main.8f984d90.css.map",
+    "main.d726dba0.js.map": "/static/js/main.d726dba0.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8f984d90.css",
+    "static/js/main.d726dba0.js"
+  ]
+}
