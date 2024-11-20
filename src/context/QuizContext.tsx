@@ -1,24 +1,33 @@
 // src/context/QuizContext.tsx
-import React, { createContext, useContext, useState, type ReactNode } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo } from 'react';
 import type { QuizState, QuizContextType, Category } from '../types/quiz.types';
 import { loadJsonDataByMode } from '../utils/loadJsonData';
 import { safeStorage, safeJsonParse, handleError } from '../utils/errorHandling';
 
+// Начальное состояние для QuizState
+const initialQuizState: QuizState = {
+  usedBlocks: {},
+  data: null,
+  completedGames: 0
+};
+
+// Начальное состояние для всего хранилища состояний
+const initialQuizStatesStorage: { [key: string]: QuizState } = {};
+
 // Создаем контекст с начальным значением
 const QuizContext = createContext<QuizContextType>({
-	showQuizPage: false,
-	setShowQuizPage: () => {},
-	selectedMode: null,
-	setSelectedMode: () => {},
-	currentQuizId: null,
-	setCurrentQuizId: () => {},
-	quizStates: {},
-	setQuizStates: () => {},
-	updateQuizState: () => {},
-	markBlockAsUsed: () => {},
-	data: null,
- });
+  showQuizPage: false,
+  setShowQuizPage: () => {},
+  selectedMode: null,
+  setSelectedMode: () => {},
+  currentQuizId: null,
+  setCurrentQuizId: () => {},
+  quizStates: initialQuizStatesStorage,
+  setQuizStates: () => {},
+  updateQuizState: () => {},
+  markBlockAsUsed: () => {},
+  data: null,
+});
 
 // Хук для использования контекста
 export const useQuizContext = () => {
@@ -29,18 +38,20 @@ export const useQuizContext = () => {
   return context;
 };
 
-// Интерфейс для пропсов провайдера
 interface QuizProviderProps {
   children: ReactNode;
 }
 
-// Компонент провайдера
-export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
+const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
   const [showQuizPage, setShowQuizPage] = useState<boolean>(() => {
     try {
       return safeStorage.getItem('showQuizPage') === 'true';
-    } catch (error) {
-      handleError(error, 'Ошибка при инициализации showQuizPage');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        handleError(error, 'Ошибка при инициализации showQuizPage');
+      } else {
+        handleError(new Error('Неизвестная ошибка'), 'Ошибка при инициализации showQuizPage');
+      }
       return false;
     }
   });
@@ -49,8 +60,12 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
     try {
       const storedMode = safeStorage.getItem('selectedMode');
       return storedMode ? Number(storedMode) : null;
-    } catch (error) {
-      handleError(error, 'Ошибка при инициализации selectedMode');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        handleError(error, 'Ошибка при инициализации selectedMode');
+      } else {
+        handleError(new Error('Неизвестная ошибка'), 'Ошибка при инициализации selectedMode');
+      }
       return null;
     }
   });
@@ -58,63 +73,90 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
   const [currentQuizId, setCurrentQuizId] = useState<string | null>(() => {
     try {
       return safeStorage.getItem('currentQuizId') || null;
-    } catch (error) {
-      handleError(error, 'Ошибка при инициализации currentQuizId');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        handleError(error, 'Ошибка при инициализации currentQuizId');
+      } else {
+        handleError(new Error('Неизвестная ошибка'), 'Ошибка при инициализации currentQuizId');
+      }
       return null;
     }
   });
 
   const [quizStates, setQuizStates] = useState<{ [key: string]: QuizState }>(() => {
-	try {
-	  const savedStates = safeStorage.getItem('quizStates');
-	  return savedStates ? 
-		 safeJsonParse(savedStates, {}) : 
-		 {}; // Возвращаем пустой объект по умолчанию
-	} catch (error) {
-	  handleError(error, 'Ошибка при инициализации quizStates');
-	  return {}; // Возвращаем пустой объект в случае ошибки
-	}
- });
+    try {
+      const savedStates = safeStorage.getItem('quizStates');
+      if (!savedStates) return initialQuizStatesStorage;
+
+      const parsedStates = safeJsonParse(savedStates, null);
+      return parsedStates || initialQuizStatesStorage;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        handleError(error, 'Ошибка при инициализации quizStates');
+      } else {
+        handleError(new Error('Неизвестная ошибка'), 'Ошибка при инициализации quizStates');
+      }
+      return initialQuizStatesStorage;
+    }
+  });
 
   const [data, setData] = useState<Category[] | null>(() => {
     try {
       const savedData = safeStorage.getItem('data');
       return savedData ? safeJsonParse(savedData, null) : null;
-    } catch (error) {
-      handleError(error, 'Ошибка при инициализации data');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        handleError(error, 'Ошибка при инициализации data');
+      } else {
+        handleError(new Error('Неизвестная ошибка'), 'Ошибка при инициализации data');
+      }
       return null;
     }
   });
 
-  React.useEffect(() => {
+  // Эффекты для сохранения в localStorage...
+  useEffect(() => {
     try {
       safeStorage.setItem('showQuizPage', String(showQuizPage));
-    } catch (error) {
-      handleError(error, 'Ошибка при сохранении showQuizPage');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        handleError(error, 'Ошибка при сохранении showQuizPage');
+      } else {
+        handleError(new Error('Неизвестная ошибка'), 'Ошибка при сохранении showQuizPage');
+      }
     }
   }, [showQuizPage]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedMode !== null) {
       try {
         safeStorage.setItem('selectedMode', String(selectedMode));
-      } catch (error) {
-        handleError(error, 'Ошибка при сохранении selectedMode');
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          handleError(error, 'Ошибка при сохранении selectedMode');
+        } else {
+          handleError(new Error('Неизвестная ошибка'), 'Ошибка при сохранении selectedMode');
+        }
       }
     }
   }, [selectedMode]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentQuizId) {
       try {
         safeStorage.setItem('currentQuizId', currentQuizId);
-      } catch (error) {
-        handleError(error, 'Ошибка при сохранении currentQuizId');
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          handleError(error, 'Ошибка при сохранении currentQuizId');
+        } else {
+          handleError(new Error('Неизвестная ошибка'), 'Ошибка при сохранении currentQuizId');
+        }
       }
     }
   }, [currentQuizId]);
 
-  React.useEffect(() => {
+  // Эффект загрузки данных...
+  useEffect(() => {
     const loadQuizData = async () => {
       if (selectedMode && currentQuizId) {
         try {
@@ -124,8 +166,12 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
             updateQuizState(currentQuizId, { data: selectedData.categories });
             safeStorage.setItem('data', JSON.stringify(selectedData.categories));
           }
-        } catch (error) {
-          handleError(error, 'Ошибка при загрузке данных викторины');
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            handleError(error, 'Ошибка при загрузке данных викторины');
+          } else {
+            handleError(new Error('Неизвестная ошибка'), 'Ошибка при загрузке данных викторины');
+          }
           setData(null);
         }
       }
@@ -134,54 +180,61 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
     loadQuizData();
   }, [selectedMode, currentQuizId]);
 
-  const updateQuizState = React.useCallback((uuid: string, newState: Partial<QuizState>) => {
+  const updateQuizState = useCallback((uuid: string, newState: Partial<QuizState>) => {
     if (!uuid) return;
     try {
       setQuizStates(prevStates => {
+        const currentState = prevStates[uuid] || { ...initialQuizState };
         const updatedStates = {
           ...prevStates,
           [uuid]: {
-            ...prevStates[uuid],
+            ...currentState,
             ...newState,
           },
         };
         safeStorage.setItem('quizStates', JSON.stringify(updatedStates));
         return updatedStates;
       });
-    } catch (error) {
-      handleError(error, 'Ошибка при обновлении состояния викторины');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        handleError(error, 'Ошибка при обновлении состояния викторины');
+      } else {
+        handleError(new Error('Неизвестная ошибка'), 'Ошибка при обновлении состояния викторины');
+      }
     }
   }, []);
 
-  const markBlockAsUsed = React.useCallback((quizId: string, categoryId: string, blockId: number) => {
+  const markBlockAsUsed = useCallback((quizId: string, categoryId: string, blockId: number) => {
     if (!quizId || !categoryId) return;
     try {
       setQuizStates(prevStates => {
-        const previousState = prevStates[quizId] || { usedBlocks: {} };
-        const updatedUsedBlocks = {
-          ...previousState.usedBlocks,
-          [categoryId]: [...(previousState.usedBlocks[categoryId] || []), blockId]
-        };
-
+        const currentState = prevStates[quizId] || { ...initialQuizState };
+        const currentUsedBlocks = currentState.usedBlocks[categoryId] || [];
+        
         const updatedStates = {
           ...prevStates,
           [quizId]: {
-            ...previousState,
-            usedBlocks: updatedUsedBlocks,
-          },
+            ...currentState,
+            usedBlocks: {
+              ...currentState.usedBlocks,
+              [categoryId]: [...currentUsedBlocks, blockId]
+            }
+          }
         };
 
         safeStorage.setItem('quizStates', JSON.stringify(updatedStates));
-        safeStorage.setItem(`usedBlocks-${quizId}`, JSON.stringify(updatedUsedBlocks));
-
         return updatedStates;
       });
-    } catch (error) {
-      handleError(error, 'Ошибка при пометке блока как использованного');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        handleError(error, 'Ошибка при пометке блока как использованного');
+      } else {
+        handleError(new Error('Неизвестная ошибка'), 'Ошибка при пометке блока как использованного');
+      }
     }
   }, []);
 
-  const contextValue = React.useMemo(() => ({
+  const contextValue = useMemo(() => ({
     showQuizPage,
     setShowQuizPage,
     selectedMode,
@@ -203,11 +256,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
     markBlockAsUsed
   ]);
 
-  return (
-    <QuizContext.Provider value={contextValue}>
-      {children}
-    </QuizContext.Provider>
-  );
+  return <QuizContext.Provider value={contextValue}>{children}</QuizContext.Provider>;
 };
 
-export { QuizContext, QuizProvider };
+export { QuizProvider, QuizContext };

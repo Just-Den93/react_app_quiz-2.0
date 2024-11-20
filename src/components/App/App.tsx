@@ -7,62 +7,71 @@ import styles from './App.module.css';
 import { useQuizContext } from '../../context/QuizContext';
 import { loadUniqueUuids } from '../../utils/loadJsonData';
 import { startQuizHandler } from './appUtils';
-
-interface QuizData {
-  uuid: string;
-  mode: number;
-  name: string;
-  categories: any[]; // Позже определим более точный тип
-}
+import type { QuizData } from '../../types/quiz.types';
 
 const App: React.FC = () => {
+  // Доступ к данным контекста
   const { showQuizPage, setShowQuizPage, setSelectedMode, setCurrentQuizId } = useQuizContext();
+  
+  // Состояние для данных викторины
   const [quizData, setQuizData] = useState<QuizData[]>([]);
 
+  // Загрузка данных викторины при монтировании компонента
   useEffect(() => {
     const uniqueData = loadUniqueUuids();
-    setQuizData(uniqueData);
+    setQuizData(uniqueData); // Установка загруженных данных
   }, []);
 
+  // Рендеринг компонента
   return (
     <Router>
       <div className={styles.container}>
-        {!showQuizPage && <Sidebar />}
-        <div className={styles.content_wraper}>
-          <div className={showQuizPage ? styles.hidden : styles.content}>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  !showQuizPage && quizData.length > 0 ? (
-                    <div className={styles.quizCardsContainer}>
-                      {quizData.map((data) => (
-                        <QuizCard
-                          key={data.uuid}
-                          startQuiz={() => startQuizHandler(
-                            data.mode,
-                            data.uuid,
-                            setSelectedMode,
-                            setCurrentQuizId,
-                            setShowQuizPage
-                          )}
-                          mode={data.mode}
-                          uuid={data.uuid}
-                          name={data.name}
-                          categories={data.categories || []}
-                        />
-                      ))}
-                    </div>
-                  ) : null
-                }
-              />
-            </Routes>
-          </div>
-        </div>
-        {showQuizPage && (
-          <div className={styles.fullscreen}>
-            <QuizPage />
-          </div>
+        {quizData.length === 0 ? (
+          <h1>Loading...</h1> // Отображение загрузки, если данных еще нет
+        ) : (
+          <>
+            {/* Отображение Sidebar, если не открыта страница викторины */}
+            {!showQuizPage && <Sidebar />}
+            <div className={styles.content_wraper}>
+              <div className={showQuizPage ? styles.hidden : styles.content}>
+                <Routes>
+                  <Route
+                    path="/"
+                    element={
+                      !showQuizPage ? (
+                        <div className={styles.quizCardsContainer}>
+                          {quizData.map((data) => (
+                            <QuizCard
+                              key={data.uuid}
+                              startQuiz={() =>
+                                startQuizHandler(
+                                  data.mode,
+                                  data.uuid,
+                                  setSelectedMode,
+                                  setCurrentQuizId,
+                                  setShowQuizPage
+                                )
+                              }
+                              mode={data.mode}
+                              uuid={data.uuid}
+                              name={data.name || 'Untitled Quiz'} // Указание значения по умолчанию
+                              categories={data.categories}
+                            />
+                          ))}
+                        </div>
+                      ) : null
+                    }
+                  />
+                </Routes>
+              </div>
+            </div>
+            {/* Отображение страницы викторины, если она активна */}
+            {showQuizPage && (
+              <div className={styles.fullscreen}>
+                <QuizPage />
+              </div>
+            )}
+          </>
         )}
       </div>
     </Router>

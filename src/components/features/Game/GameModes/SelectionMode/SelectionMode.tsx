@@ -1,8 +1,8 @@
-// src/components/features/Game/GameModes/SelectionMode/SelectionMode.tsx
 import React from 'react';
 import { Button, BUTTON_VARIANTS } from '../../../../common/Button/Button';
 import Timer from '../../../../common/Timer/Timer';
-import styles from './SelectionMode.module.css';
+import styles from './SelectionMode.module.css'; // Импортируем CSS-модуль
+
 import {
   handleForceStopInternal,
   handleShowAnswerInternal,
@@ -11,6 +11,12 @@ import {
   getAnswerFontSize,
   formatTextWithHighlights
 } from './SelectionModeUtils';
+
+// Интерфейс для стилей, все свойства строго строки
+interface Styles {
+  incorrectOption: string;
+  [key: string]: string;
+}
 
 interface Block {
   id: number;
@@ -62,11 +68,10 @@ const SelectionMode: React.FC<SelectionModeProps> = ({
     setTimerStarted(false);
   }, [block, setTimerStarted]);
 
-  // Мемоизация компонентов для оптимизации производительности
   const renderQuestion = React.useMemo(() => {
     return answerShown ? (
-      <div 
-        className={styles.question} 
+      <div
+        className={styles.question}
         style={{ fontSize: `${getAnswerFontSize(block.text)}px` }}
       >
         {formatTextWithHighlights(block.text)}
@@ -91,7 +96,7 @@ const SelectionMode: React.FC<SelectionModeProps> = ({
   const renderControls = React.useMemo(() => {
     if (!timerStarted) {
       return (
-        <Button 
+        <Button
           variant={BUTTON_VARIANTS.TIMER}
           onClick={() => setTimerStarted(true)}
         />
@@ -113,14 +118,24 @@ const SelectionMode: React.FC<SelectionModeProps> = ({
     if (!answerShown) {
       return (
         <div className={styles.buttonGroup}>
-          <Button 
+          <Button
             variant={BUTTON_VARIANTS.SHOW_ANSWER}
-            onClick={() => handleShowAnswerInternal(block, styles, handleShowAnswer, setAnswerShown, setHighlightedOptions)}
+            onClick={() =>
+              handleShowAnswerInternal(
+                block,
+                styles as Styles, // Приведение к типу
+                handleShowAnswer,
+                setAnswerShown,
+                setHighlightedOptions
+              )
+            }
           />
           {!hintUsed && (
-            <Button 
+            <Button
               variant={BUTTON_VARIANTS.HINT}
-              onClick={() => handleHintInternal(block, styles, setHintUsed, setHighlightedOptions)}
+              onClick={() =>
+                handleHintInternal(block, styles as Styles, setHintUsed, setHighlightedOptions)
+              }
             />
           )}
         </div>
@@ -128,23 +143,23 @@ const SelectionMode: React.FC<SelectionModeProps> = ({
     }
 
     return (
-      <Button 
+      <Button
         variant={BUTTON_VARIANTS.SELECT_CATEGORY}
         onClick={() => handleSelectCategory(block.categoryId, block.id)}
       />
     );
   }, [
-    timerStarted, 
-    timerEnded, 
-    answerShown, 
-    hintUsed, 
-    block, 
-    handleForceStop, 
-    handleShowAnswer, 
+    timerStarted,
+    timerEnded,
+    answerShown,
+    hintUsed,
+    block,
+    handleForceStop,
+    handleShowAnswer,
     handleSelectCategory,
     handleTimerEnd,
     forceStopped,
-    setTimerStarted
+    setTimerStarted,
   ]);
 
   return (
@@ -156,15 +171,11 @@ const SelectionMode: React.FC<SelectionModeProps> = ({
       <div className={styles.wrapper}>
         <div className={styles.selectionMode}>
           {renderQuestion}
-          <div className={styles.options}>
-            {renderOptions}
-          </div>
+          <div className={styles.options}>{renderOptions}</div>
         </div>
       </div>
       <div className={styles.controlBlock}>
-        <div className={styles.timerSpace}>
-          {renderControls}
-        </div>
+        <div className={styles.timerSpace}>{renderControls}</div>
       </div>
     </div>
   );

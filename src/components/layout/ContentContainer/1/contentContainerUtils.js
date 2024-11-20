@@ -1,5 +1,5 @@
 import React from 'react';
-import CategoryRow from '../../features/Quiz/CategoryRow/CategoryRow';
+import CategoryRow from '../../../features/Quiz/CategoryRow/CategoryRow';
 
 // Функция для рендеринга строк категорий
 export function renderCategoryRows(data, onBlockSelect) {

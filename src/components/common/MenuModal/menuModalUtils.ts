@@ -17,6 +17,7 @@ export const resetQuizStateAndCloseModal = (
       [currentQuizId]: {
         usedBlocks: {},
         data: null,
+        completedGames: 0,
       },
     }));
   }
